@@ -57,18 +57,20 @@ class Log_In_As {
 	function login_form() {
 
 		echo '<div id="log-in-as">';
+		echo '<button class="button button-small alignright">'. esc_html__( 'Standard login', 'log-in-as' ) . '</button>';
 
-		echo '<h2>Log in as&hellip;</h2>';
+		echo '<h2>'. esc_html__( 'Log in as&hellip;', 'log-in-as' ) . '</h2>';
 
 		$hide = false;
 		$class = '';
 
 		if ( is_multisite() ) {
-			$heading = "<h4>Super Admin<span class='dashicons dashicons-arrow-down-alt2'></span></h4>";
+			$heading = '<h4>' .
+				sprintf( esc_html__( 'Super Admin %s', 'log-in-as' ), "<span class='dashicons dashicons-arrow-down-alt2'></span>" ) .
+				'</h4>';
 			$links = array();
 			foreach ( get_super_admins() as $username ) {
 				$user = get_user_by( 'login', $username );
-				$url = esc_url( admin_url( "admin-ajax.php?action=log_in_as&user_id={$user->ID}" ) );
 				$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>{$user->user_login}</a>";
 			}
 			if ( ! empty( $links ) ) {
@@ -85,11 +87,20 @@ class Log_In_As {
 			require_once(ABSPATH . 'wp-admin/includes/user.php');
 		}
 
+		// default args for users query
+		$get_user_args = apply_filters( 'log_in_as_user_args', array( 'number' => 2 ) );
+
 		foreach ( get_editable_roles() as $role => $details ) {
-			$heading = "<h4>{$details['name']}<span class='dashicons dashicons-arrow-down-alt2'></span></h4>";
+			$role_name = esc_html( $details['name'] );
+			$heading = "<h4>{$role_name}<span class='dashicons dashicons-arrow-down-alt2'></span></h4>";
 			$links = array();
-			foreach ( get_users( array( 'role' => $role ) ) as $user ) {
-				$url = esc_url( admin_url( "admin-ajax.php?action=log_in_as&user_id={$user->ID}" ) );
+
+			// filter for per-role query args
+			$args = apply_filters( 'log_in_as_user_args_for_' . $role, $get_user_args );
+			// make sure we don't alter the role
+			$args = array_merge( $args, array( 'role' => $role ) );
+
+			foreach ( get_users( $args ) as $user ) {
 				$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>{$user->user_login}</a>";
 			}
 			if ( ! empty( $links ) ) {

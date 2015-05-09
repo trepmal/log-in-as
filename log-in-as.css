@@ -2,6 +2,20 @@
 	display: none;
 }
 
+#log-in-as {
+	clear: both;
+}
+
+#log-in-as.pad {
+	padding: 10px 0 0;
+}
+
+#log-in-as button.button {
+	clear: both;
+	float: right;
+	margin: -5px -5px 0 0 !important;
+}
+
 #log-in-as h2 {
 	margin: 0 0 20px;
 }

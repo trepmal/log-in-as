@@ -3,6 +3,18 @@
 	var wp = window.wp,
 		$loginform = $('#loginform');
 
+	buttonClick = function( event ) {
+		event.preventDefault();
+
+		// $('#log-in-as').slideToggle();
+		$forgetmenot = $('p.forgetmenot').detach()
+		$('#log-in-as').before( $forgetmenot );
+		$submit = $('p.submit').detach()
+		$('#log-in-as').before( $submit );
+		$('#log-in-as').toggleClass('pad');
+		$loginform.find('p').slideToggle();
+	}
+
 	userClick = function( event ) {
 		event.preventDefault();
 
@@ -39,7 +51,8 @@
 		$(this).next('.log-in-as-group').slideToggle('hidden');
 	}
 
+	$('button.button').on('click', buttonClick );
+	$('#log-in-as h4').on('click', roleHeadingClick );
 	$('.log-in-as-user').on( 'click', userClick );
-	$('h4').on('click', roleHeadingClick );
 
 })( jQuery );
