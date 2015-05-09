@@ -23,12 +23,22 @@ class Log_In_As {
 	 * @return void
 	 */
 	function __construct() {
+		add_action( 'init',               array( $this, 'admin_init' ), -100 );
 		add_action( 'login_head',               array( $this, 'login_head' ) );
 		add_action( 'login_form',               array( $this, 'login_form' ) );
 		add_action( 'wp_ajax_log_in_as',        array( $this, 'already_logged_in' ) );
 		add_action( 'wp_ajax_nopriv_log_in_as', array( $this, 'log_in_as' ) );
 	}
 
+	/**
+	 * Turn on output buffering early
+	 * In local dev, you may have notices and junk. Catch them in output
+	 * buffering so they don't break the ajaxy-login
+	 */
+	function admin_init() {
+		if ( ! defined( 'DOING_AJAX' ) ) return;
+		ob_start();
+	}
 	/**
 	 * Enqueue our assets
 	 *
@@ -121,6 +131,9 @@ class Log_In_As {
 		// attempt to sign in
 		$user = wp_signon();
 
+		// flush the buffer (it's fun to say)
+		ob_end_clean();
+
 		// if successful, send Dashboard url to JS for redirecting
 		if ( ! is_wp_error( $user ) ) {
 			wp_send_json_success( esc_url( admin_url() ) );
@@ -144,6 +157,9 @@ class Log_In_As {
 			'<a href="' . esc_url( wp_logout_url() ) . '">' . __( 'Log out', 'log-in-as' ) . '</a>',
 		);
 		$action_links = implode( ' | ', $actions );
+
+		// clean it like you mean it
+		ob_end_clean();
 
 		wp_send_json_error(
 			sprintf( __( 'You are already logged in as %s.', 'log-in-as' ), wp_get_current_user()->user_login ) .
