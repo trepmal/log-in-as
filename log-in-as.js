@@ -6,12 +6,17 @@
 	buttonClick = function( event ) {
 		event.preventDefault();
 
-		// $('#log-in-as').slideToggle();
+		// move the 'remember me' checkbox and submit button elements
+		// above our user selection div so they can toggle together
 		$forgetmenot = $('p.forgetmenot').detach()
 		$('#log-in-as').before( $forgetmenot );
 		$submit = $('p.submit').detach()
 		$('#log-in-as').before( $submit );
+
+		// add class padding class for compat with standard login form
 		$('#log-in-as').toggleClass('pad');
+
+		// toggle the standard form
 		$loginform.find('p').slideToggle();
 	}
 
@@ -20,6 +25,7 @@
 
 		var $a = $(this);
 
+		// dim form so user know *something* is happening
 		$loginform.css('opacity', '0.3');
 
 		wp.ajax.send( 'log_in_as', {
@@ -32,12 +38,15 @@
 	}
 
 	userClickSuccess = function( data ) {
+		// all good, go to Dashboard
 		window.location = data;
 	}
 
 	userClickError = function ( data ) {
-		console.log( data );
+		// restore opacity to indicate we tried
 		$loginform.css('opacity', '1');
+
+		// output error, creating container if needed
 		$error = $('#login_error')
 		if ( $error.length < 1 ) {
 			$error_wrap = $('<div id="login_error"/>');
