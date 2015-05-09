@@ -1,0 +1,30 @@
+#loginform > p {
+	display: none;
+}
+
+#log-in-as h2 {
+	margin: 0 0 20px;
+}
+
+#log-in-as h4 {
+	padding: 5px;
+	border-bottom: 2px solid grey;
+}
+#log-in-as h4 .dashicons {
+	cursor: pointer;
+	float: right;
+}
+
+#log-in-as .log-in-as-user {
+	display: block;
+	padding: 5px 10px;
+	background: whitesmoke;
+	margin: 0 0 3px;
+}
+#log-in-as .log-in-as-user:hover {
+	background: gainsboro;
+}
+
+#log-in-as .log-in-as-group.hidden {
+	display: none;
+}
