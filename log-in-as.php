@@ -69,7 +69,7 @@ class Log_In_As {
 			foreach ( get_super_admins() as $username ) {
 				$user = get_user_by( 'login', $username );
 				$url = esc_url( admin_url( "admin-ajax.php?action=log_in_as&user_id={$user->ID}" ) );
-				$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>({$user->ID}) {$user->user_login} : {$user->user_email}</a><br />";
+				$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>{$user->user_login}</a>";
 			}
 			if ( ! empty( $links ) ) {
 				echo $heading;
