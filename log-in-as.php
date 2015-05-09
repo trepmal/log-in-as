@@ -23,7 +23,7 @@ class Log_In_As {
 	 * @return void
 	 */
 	function __construct() {
-		add_action( 'init',               array( $this, 'admin_init' ), -100 );
+		add_action( 'init',                     array( $this, 'admin_init' ), -100 );
 		add_action( 'login_head',               array( $this, 'login_head' ) );
 		add_action( 'login_form',               array( $this, 'login_form' ) );
 		add_action( 'wp_ajax_log_in_as',        array( $this, 'already_logged_in' ) );
@@ -80,26 +80,26 @@ class Log_In_As {
 				echo '<div class="log-in-as-group ' . $class . '">' . implode( ' ' , $links ) . '</div>';
 			}
 		}
-		// sorry, at the moment MS support is limited to super admins
-		else {
 
-			foreach ( get_editable_roles() as $role => $details ) {
-				$heading = "<h4>{$details['name']}<span class='dashicons dashicons-arrow-down-alt2'></span></h4>";
-				$links = array();
-				foreach ( get_users( array( 'role' => $role ) ) as $user ) {
-					$url = esc_url( admin_url( "admin-ajax.php?action=log_in_as&user_id={$user->ID}" ) );
-					$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>{$user->user_login}</a>";
-				}
-				if ( ! empty( $links ) ) {
-					echo $heading;
-					if ( $hide ) {
-						$class = ' hidden';
-					}
-					$hide = true;
-					echo '<div class="log-in-as-group ' . $class . '">' . implode( ' ' , $links ) . '</div>';
-				}
+		if ( ! function_exists('get_editable_roles' ) ) {
+			require_once(ABSPATH . 'wp-admin/includes/user.php');
+		}
+
+		foreach ( get_editable_roles() as $role => $details ) {
+			$heading = "<h4>{$details['name']}<span class='dashicons dashicons-arrow-down-alt2'></span></h4>";
+			$links = array();
+			foreach ( get_users( array( 'role' => $role ) ) as $user ) {
+				$url = esc_url( admin_url( "admin-ajax.php?action=log_in_as&user_id={$user->ID}" ) );
+				$links[] = "<a href='#' data-user-id='{$user->ID}' class='log-in-as-user'>{$user->user_login}</a>";
 			}
-
+			if ( ! empty( $links ) ) {
+				echo $heading;
+				if ( $hide ) {
+					$class = ' hidden';
+				}
+				$hide = true;
+				echo '<div class="log-in-as-group ' . $class . '">' . implode( ' ' , $links ) . '</div>';
+			}
 		}
 
 		echo '</div>';
