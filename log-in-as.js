@@ -26,9 +26,41 @@
 		var $a = $(this);
 
 		// dim form so user know *something* is happening
-		$loginform.css('opacity', '0.3');
+		$('body').css('opacity', '0.3');
 
 		wp.ajax.send( 'log_in_as', {
+			data: {
+				user_id : $a.attr('data-user-id')
+			},
+			success: userClickSuccess,
+			error: userClickError
+		} );
+	}
+
+	userClick2 = function( event ) {
+		event.preventDefault();
+
+		var $a = $(this);
+
+		$('body').css('opacity', '0.3');
+
+		wp.ajax.send( 'log_out_and_in_as', {
+			data: {
+				user_id : $a.attr('data-user-id')
+			},
+			success: userClickSuccess,
+			error: userClickError
+		} );
+	}
+
+	userClick3 = function( event ) {
+		event.preventDefault();
+
+		var $a = $(this);
+
+		$('body').css('opacity', '0.3');
+
+		wp.ajax.send( 'switch_back', {
 			data: {
 				user_id : $a.attr('data-user-id')
 			},
@@ -44,7 +76,7 @@
 
 	userClickError = function ( data ) {
 		// restore opacity to indicate we tried
-		$loginform.css('opacity', '1');
+		$('body').css('opacity', '1');
 
 		// output error, creating container if needed
 		$error = $('#login_error')
@@ -63,5 +95,7 @@
 	$('button.button').on('click', buttonClick );
 	$('#log-in-as h4').on('click', roleHeadingClick );
 	$('.log-in-as-user').on( 'click', userClick );
+	$('.log-out-and-in-as-user').on( 'click', userClick2 );
+	$('.switch-back').on( 'click', userClick3 );
 
 })( jQuery );

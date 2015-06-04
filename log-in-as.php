@@ -23,11 +23,17 @@ class Log_In_As {
 	 * @return void
 	 */
 	function __construct() {
-		add_action( 'init',                     array( $this, 'admin_init' ), -100 );
-		add_action( 'login_head',               array( $this, 'login_head' ) );
-		add_action( 'login_form',               array( $this, 'login_form' ) );
-		add_action( 'wp_ajax_log_in_as',        array( $this, 'already_logged_in' ) );
-		add_action( 'wp_ajax_nopriv_log_in_as', array( $this, 'log_in_as' ) );
+		add_action( 'init',                      array( $this, 'admin_init' ), -100 );
+		add_action( 'login_head',                array( $this, 'assets' ) );
+		add_action( 'login_form',                array( $this, 'login_form' ) );
+		add_action( 'wp_ajax_log_in_as',         array( $this, 'already_logged_in' ) );
+		add_action( 'wp_ajax_nopriv_log_in_as',  array( $this, 'log_in_as' ) );
+		add_action( 'wp_ajax_log_out_and_in_as', array( $this, 'log_out_and_in_as' ) );
+		add_action( 'wp_ajax_switch_back',       array( $this, 'switch_back' ) );
+
+		add_action( 'admin_enqueue_scripts',     array( $this, 'assets' ) );
+		add_action( 'admin_notices',             array( $this, 'admin_notices' ) );
+		add_filter( 'user_row_actions',          array( $this, 'user_row_actions' ), 10, 2 );
 	}
 
 	/**
@@ -39,12 +45,13 @@ class Log_In_As {
 		if ( ! defined( 'DOING_AJAX' ) ) return;
 		ob_start();
 	}
+
 	/**
 	 * Enqueue our assets
 	 *
 	 * @return void
 	 */
-	function login_head() {
+	function assets() {
 		wp_enqueue_script( 'log-in-as', plugins_url( 'log-in-as.js', __FILE__ ), array('wp-util', 'jquery'), '0.0.1', true );
 		wp_enqueue_style( 'log-in-as', plugins_url( 'log-in-as.css', __FILE__ ), array(), '0.0.1' );
 	}
@@ -156,6 +163,36 @@ class Log_In_As {
 	}
 
 	/**
+	 * Ajax Callback for logged in users that are switching
+	 * Authenticate given user ID
+	 *
+	 * @return void
+	 */
+	function log_out_and_in_as() {
+
+		// save original user for switching back, yes, this can be faked
+		setcookie( 'switch', get_current_user_id(), time() + ( 86400 * 7 ) );
+
+		wp_logout();
+		$this->log_in_as();
+	}
+
+	/**
+	 * Ajax Callback for logged in users that are switching back
+	 * Authenticate given user ID
+	 *
+	 * @return void
+	 */
+	function switch_back() {
+
+		// remove cookie
+		setcookie( 'switch', '', time() - ( 86400 * 7 ) );
+
+		wp_logout();
+		$this->log_in_as();
+	}
+
+	/**
 	 * Ajax Callback for logged in users
 	 * If logged in, tell them and give options
 	 *
@@ -176,6 +213,36 @@ class Log_In_As {
 			sprintf( __( 'You are already logged in as %s.', 'log-in-as' ), wp_get_current_user()->user_login ) .
 			"<p>$action_links</p>"
 		);
+	}
+
+	/**
+	 * Display 'switch back' for switched users
+	 *
+	 * @return void
+	 */
+	function admin_notices() {
+		if ( ! isset( $_COOKIE['switch'] ) ) return;
+		$user = absint( $_COOKIE['switch'] );
+		if ( ! ( $original_user = get_user_by( 'id', $user ) ) ) return;
+
+		$text = sprintf( esc_html__( 'Switch back to %s', 'log-in-as' ), $original_user->user_login );
+		echo "<div class='notice'><p><a href='#' data-user-id='{$user}' class='switch-back'>{$text}</a></p></div>";
+	}
+
+	/**
+	 * Add switch links to users table
+	 *
+	 * @param array $actions
+	 * @param object $user User object
+	 * @return array Actions
+	 */
+	function user_row_actions( $actions, $user ) {
+		if ( get_current_user_id() === $user->ID ) {
+			return $actions;
+		}
+		$text = esc_html__( 'Switch', 'log-in-as' );
+		$actions['switch'] = "<a href='#' data-user-id='{$user->ID}' class='log-out-and-in-as-user'>{$text}</a>";
+		return $actions;
 	}
 
 }
