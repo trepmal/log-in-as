@@ -3,7 +3,7 @@
  * Plugin Name: Log In As
  * Plugin URI: trepmal.com
  * Description: Log in as any user. Handy for local dev where databases come and go and you can never remember the dang credentials.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: Kailey Lampert
  * Author URI: kaileylampert.com
  * License: GPLv2 or later
