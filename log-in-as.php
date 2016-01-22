@@ -31,7 +31,7 @@ class Log_In_As {
 		add_action( 'wp_ajax_log_out_and_in_as', array( $this, 'log_out_and_in_as' ) );
 		add_action( 'wp_ajax_switch_back',       array( $this, 'switch_back' ) );
 
-		add_action( 'admin_enqueue_scripts',     array( $this, 'assets' ) );
+		add_action( 'login_enqueue_scripts',     array( $this, 'assets' ) );
 		add_action( 'admin_notices',             array( $this, 'admin_notices' ) );
 		add_filter( 'user_row_actions',          array( $this, 'user_row_actions' ), 10, 2 );
 	}
