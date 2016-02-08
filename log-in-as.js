@@ -72,7 +72,7 @@
 
 	userClickSuccess = function( data ) {
 		// all good, go to Dashboard
-		window.location.href = data;
+		window.location = data;
 	}
 
 	userClickError = function ( data ) {

@@ -27,15 +27,18 @@ class Log_In_As {
 		add_action( 'login_head',                array( $this, 'assets' ) );
 		add_action( 'login_form',                array( $this, 'login_form' ) );
 
+		if ( isset( $_REQUEST['user_id'] ) ) {
 		remove_all_filters( 'authenticate' );
 		add_action( 'authenticate',              array( $this, 'authenticate' ) );
+		}
 
 		add_action( 'wp_ajax_log_in_as',         array( $this, 'already_logged_in' ) );
 		add_action( 'wp_ajax_nopriv_log_in_as',  array( $this, 'log_in_as' ) );
 		add_action( 'wp_ajax_log_out_and_in_as', array( $this, 'log_out_and_in_as' ) );
 		add_action( 'wp_ajax_switch_back',       array( $this, 'switch_back' ) );
 
-		add_action( 'login_enqueue_scripts',     array( $this, 'assets' ) );
+		// hook on admin* so switching works
+		add_action( 'admin_enqueue_scripts',     array( $this, 'assets' ) );
 		add_action( 'admin_notices',             array( $this, 'admin_notices' ) );
 		add_filter( 'user_row_actions',          array( $this, 'user_row_actions' ), 10, 2 );
 	}
@@ -134,11 +137,7 @@ class Log_In_As {
 	 * @return WP_User|WP_Error User or Error
 	 */
 	function authenticate( $user ) {
-		if ( isset( $_REQUEST['user_id'] ) ) {
-			return get_user_by( 'id', $_REQUEST['user_id'] );
-		} else {
-			return $user;
-		}
+		return get_user_by( 'id', $_REQUEST['user_id'] );
 	}
 
 	/**
