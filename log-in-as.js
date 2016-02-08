@@ -30,7 +30,8 @@
 
 		wp.ajax.send( 'log_in_as', {
 			data: {
-				user_id : $a.attr('data-user-id')
+				user_id : $a.attr('data-user-id'),
+				interim : $('input[name="interim-login"]').length
 			},
 			success: userClickSuccess,
 			error: userClickError
@@ -71,7 +72,7 @@
 
 	userClickSuccess = function( data ) {
 		// all good, go to Dashboard
-		window.location = data;
+		window.location.href = data;
 	}
 
 	userClickError = function ( data ) {

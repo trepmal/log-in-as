@@ -3,7 +3,7 @@
  * Plugin Name: Log In As
  * Plugin URI: trepmal.com
  * Description: Log in as any user. Handy for local dev where databases come and go and you can never remember the dang credentials.
- * Version: 0.0.2
+ * Version: 0.0.3
  * Author: Kailey Lampert
  * Author URI: kaileylampert.com
  * License: GPLv2 or later
@@ -26,6 +26,10 @@ class Log_In_As {
 		add_action( 'init',                      array( $this, 'admin_init' ), -100 );
 		add_action( 'login_head',                array( $this, 'assets' ) );
 		add_action( 'login_form',                array( $this, 'login_form' ) );
+
+		remove_all_filters( 'authenticate' );
+		add_action( 'authenticate',              array( $this, 'authenticate' ) );
+
 		add_action( 'wp_ajax_log_in_as',         array( $this, 'already_logged_in' ) );
 		add_action( 'wp_ajax_nopriv_log_in_as',  array( $this, 'log_in_as' ) );
 		add_action( 'wp_ajax_log_out_and_in_as', array( $this, 'log_out_and_in_as' ) );
@@ -52,8 +56,8 @@ class Log_In_As {
 	 * @return void
 	 */
 	function assets() {
-		wp_enqueue_script( 'log-in-as', plugins_url( 'log-in-as.js', __FILE__ ), array('wp-util', 'jquery'), '0.0.1', true );
-		wp_enqueue_style( 'log-in-as', plugins_url( 'log-in-as.css', __FILE__ ), array(), '0.0.1' );
+		wp_enqueue_script( 'log-in-as', plugins_url( 'log-in-as.js', __FILE__ ), array('wp-util', 'jquery'), '0.0.3', true );
+		wp_enqueue_style( 'log-in-as', plugins_url( 'log-in-as.css', __FILE__ ), array(), '0.0.3' );
 	}
 
 	/**
@@ -129,8 +133,12 @@ class Log_In_As {
 	 *
 	 * @return WP_User|WP_Error User or Error
 	 */
-	function authenticate() {
-		return get_user_by( 'id', absint( $_POST['user_id'] ) );
+	function authenticate( $user ) {
+		if ( isset( $_REQUEST['user_id'] ) ) {
+			return get_user_by( 'id', $_REQUEST['user_id'] );
+		} else {
+			return $user;
+		}
 	}
 
 	/**
@@ -142,10 +150,6 @@ class Log_In_As {
 	function log_in_as() {
 		sleep(1);
 
-		// replace any authentication with our own
-		remove_all_filters( 'authenticate' );
-		add_filter( 'authenticate', array( $this, 'authenticate' ) );
-
 		// attempt to sign in
 		$user = wp_signon();
 
@@ -154,7 +158,16 @@ class Log_In_As {
 
 		// if successful, send Dashboard url to JS for redirecting
 		if ( ! is_wp_error( $user ) ) {
-			wp_send_json_success( esc_url( admin_url() ) );
+			$redirect = admin_url();
+			if ( 1 == intval( $_POST['interim' ] ) ) {
+				$redirect = add_query_arg( array(
+					'action'          => 'login',
+					'user_id'         => $_POST['user_id'],
+					'customize-login' => '1',
+					'interim-login'   => '1',
+				), wp_login_url() );
+			}
+			wp_send_json_success( $redirect );
 
 		// otherwise, send error message
 		} else {
