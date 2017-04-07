@@ -6,15 +6,18 @@
 	buttonClick = function( event ) {
 		event.preventDefault();
 
+		var $logInAs = $('#log-in-as');
+
 		// move the 'remember me' checkbox and submit button elements
 		// above our user selection div so they can toggle together
 		$forgetmenot = $('p.forgetmenot').detach()
-		$('#log-in-as').before( $forgetmenot );
-		$submit = $('p.submit').detach()
-		$('#log-in-as').before( $submit );
+		$logInAs.before( $forgetmenot );
+
+		$submit      = $('p.submit').detach()
+		$logInAs.before( $submit );
 
 		// add class padding class for compat with standard login form
-		$('#log-in-as').toggleClass('pad');
+		$logInAs.toggleClass('pad');
 
 		// toggle the standard form
 		$loginform.find('p').slideToggle();
@@ -93,7 +96,7 @@
 		$(this).next('.log-in-as-group').slideToggle('hidden');
 	}
 
-	$('button.button').on('click', buttonClick );
+	$('#log-in-as button.button').on('click', buttonClick );
 	$('#log-in-as h4').on('click', roleHeadingClick );
 	$('.log-in-as-user').on( 'click', userClick );
 	$('.log-out-and-in-as-user').on( 'click', userClick2 );
