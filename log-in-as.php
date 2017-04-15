@@ -137,7 +137,7 @@ class Log_In_As {
 	 *
 	 * @param null|WP_User|WP_Error $user     WP_User if the user is authenticated.
 	 *                                        WP_Error or null otherwise.
-	 * @return WP_User|WP_Error User or Error
+	 * @return WP_User|false User or Error
 	 */
 	function authenticate( $user ) {
 		$uid = isset( $_REQUEST['user_id'] ) ? absint( $_REQUEST['user_id'] ) : 0;
