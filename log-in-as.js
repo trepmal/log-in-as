@@ -20,7 +20,9 @@
 		$logInAs.toggleClass('pad');
 
 		// toggle the standard form
-		$loginform.find('p').slideToggle();
+		$loginform.find('p,div.user-pass-wrap').slideToggle( function() {
+			$loginform.find('div.user-pass-wrap input').removeAttr( 'disabled' );
+		});
 	}
 
 	userClick = function( event ) {

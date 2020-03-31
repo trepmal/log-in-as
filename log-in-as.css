@@ -1,4 +1,5 @@
-#loginform > p {
+#loginform > p,
+#loginform > div.user-pass-wrap {
 	display: none;
 }
 
